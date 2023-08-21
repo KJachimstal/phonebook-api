@@ -1,45 +1,19 @@
-const fs = require("fs/promises");
+const fs = require("fs");
 const path = require("path");
 
 // * Declare file path
 const contactsPath = path.normalize("models/contacts.json");
 
-// function getContacts() {
-//   fs.readFile(contactsPath, "utf8", (err, data) => {
-//     if (err) {
-//       console.error(err);
-//       return;
-//     }
-//     console.log(data);
-//   });
-// }
+const getContacts = () => fs.readFileSync(contactsPath, "utf8");
 
-const getContacts = async () => {
-  return await new Promise(function (resolve, reject) {
-    fs.readFile(contactsPath, "utf8", (err, data) => {
-      if (err) reject(err);
-      return resolve(JSON.parse(data));
-    });
-  }).then((data) => {
-    console.log(data);
-  });
-};
-
-const getContactById = async (contactId) => {
-  return new Promise(function (resolve, reject) {
-    fs.readFile(contactsPath, "utf8", (err, data) => {
-      if (err) reject(err);
-      return resolve(JSON.parse(data));
-    });
-  }).then((data) => {
-    const findedContact = data.find((obj) => obj.id === contactId);
-
-    if (findedContact) {
-      console.log(findedContact);
-    } else {
-      console.log("Contact not found!");
-    }
-  });
+const getContactById = (contactId) => {
+  const data = JSON.parse(getContacts());
+  const findedContact = data.find((obj) => obj.id === contactId);
+  if (findedContact) {
+    return findedContact;
+  } else {
+    console.log("Contact not found!");
+  }
 };
 
 const removeContact = async (contactId) => {
