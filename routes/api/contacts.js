@@ -1,5 +1,9 @@
 const express = require("express");
-const { getContacts, getContactById } = require("../../models/contacts");
+const {
+  getContacts,
+  getContactById,
+  removeContact,
+} = require("../../models/contacts");
 
 const router = express.Router();
 
@@ -8,15 +12,17 @@ router.get("/", async (req, res, next) => {
 });
 
 router.get("/:contactId", async (req, res, next) => {
-  res.json({ data: getContactById(req.params.contactId) });
+  const contact = getContactById(req.params.contactId);
+  res.json(contact ? { data: contact } : { message: "Not found" });
 });
 
 router.post("/", async (req, res, next) => {
-  res.json({ message: "template message" });
+  res.json("//");
 });
 
 router.delete("/:contactId", async (req, res, next) => {
-  res.json({ message: "template message" });
+  const isDeleted = removeContact(req.params.contactId);
+  res.json({ message: isDeleted ? "contact deleted" : "Not found" });
 });
 
 router.put("/:contactId", async (req, res, next) => {

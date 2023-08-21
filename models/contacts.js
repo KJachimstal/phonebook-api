@@ -7,34 +7,29 @@ const contactsPath = path.normalize("models/contacts.json");
 const getContacts = () => fs.readFileSync(contactsPath, "utf8");
 
 const getContactById = (contactId) => {
-  const data = JSON.parse(getContacts());
-  const findedContact = data.find((obj) => obj.id === contactId);
+  const readedData = JSON.parse(getContacts());
+  const findedContact = readedData.find((obj) => obj.id === contactId);
   if (findedContact) {
     return findedContact;
   } else {
-    console.log("Contact not found!");
+    return null;
   }
 };
 
-const removeContact = async (contactId) => {
-  return new Promise(function (resolve, reject) {
-    fs.readFile(contactsPath, "utf8", (err, data) => {
-      if (err) reject(err);
-      return resolve(JSON.parse(data));
+const removeContact = (contactId) => {
+  const readedData = JSON.parse(getContacts());
+  const findedContactIndex = readedData.findIndex(
+    (obj) => obj.id === contactId
+  );
+  if (findedContactIndex !== -1) {
+    readedData.splice(findedContactIndex, 1);
+    fs.writeFile(contactsPath, JSON.stringify(readedData), (err) => {
+      if (err) console.log(err);
     });
-  }).then((data) => {
-    const findedContactIndex = data.findIndex((obj) => obj.id === contactId);
-    if (findedContactIndex !== -1) {
-      data.splice(findedContactIndex, 1);
-      fs.writeFile(contactsPath, JSON.stringify(data), (err) => {
-        if (err) console.log(err);
-      });
-      console.log("Contact has been deleted!");
-      console.table(data);
-    } else {
-      console.log("Contact not found! Unable to delete!");
-    }
-  });
+    return true;
+  } else {
+    return false;
+  }
 };
 
 const addContact = async ({ name, email, phone }) => {
