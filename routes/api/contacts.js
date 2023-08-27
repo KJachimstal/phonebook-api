@@ -37,7 +37,11 @@ router.post("/", bodyParser.json(), async (req, res, next) => {
 
 router.delete("/:contactId", async (req, res, next) => {
   const isDeleted = await removeContact(req.params.contactId);
-  res.json({ message: isDeleted ? "contact deleted" : "Not found" });
+  isDeleted
+    ? res.json({ message: "contact deleted" })
+    : res.status(404).send({
+        message: "Not found",
+      });
 });
 
 router.put("/:contactId", async (req, res, next) => {
@@ -51,7 +55,13 @@ router.put("/:contactId", async (req, res, next) => {
     phone: req.body.phone,
   });
 
-  res.json({ data: changedContact });
+  if (changedContact) {
+    res.json({ data: changedContact });
+  } else {
+    res.status(404).send({
+      message: "Not found",
+    });
+  }
 });
 
 module.exports = router;
