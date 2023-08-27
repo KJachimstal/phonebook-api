@@ -1,6 +1,7 @@
 const fs = require("fs");
 const fsPromise = require("fs/promises");
 const path = require("path");
+const { v4: uuidv4 } = require("uuid");
 
 // * Declare file path
 const contactsPath = path.normalize("models/contacts.json");
@@ -46,7 +47,7 @@ const addContact = async ({ name, email, phone }) => {
   const contacts = await getContacts();
   const readedData = JSON.parse(contacts);
   const newContact = {
-    id: `${readedData.length + 1}`,
+    id: uuidv4(),
     name,
     email,
     phone,
