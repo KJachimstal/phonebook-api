@@ -2,6 +2,7 @@ const fs = require("fs");
 const fsPromise = require("fs/promises");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
+const Joi = require("joi");
 
 // * Declare file path
 const contactsPath = path.normalize("models/contacts.json");
@@ -84,26 +85,22 @@ const updateContact = async (contactId, body) => {
   }
 };
 
+const validationSchema = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email().required(),
+  phone: Joi.string().required(),
+});
+
 const checkRequiredParams = (req, res) => {
-  if (!req.body.name) {
-    return res.status(400).send({
-      message: "Missing required param - name",
-    });
-  }
+  const validation = validationSchema.validate(req.body);
 
-  if (!req.body.email) {
+  if (validation.error) {
     return res.status(400).send({
-      message: "Missing required param - email",
+      message: validation.error.details[0].message,
     });
+  } else {
+    return null;
   }
-
-  if (!req.body.phone) {
-    return res.status(400).send({
-      message: "Missing required param - phone",
-    });
-  }
-
-  return null;
 };
 
 module.exports = {
