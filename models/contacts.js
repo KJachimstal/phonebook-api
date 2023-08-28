@@ -67,7 +67,7 @@ const updateContact = async (contactId, body) => {
   const readedData = JSON.parse(contacts);
 
   const findedContactIndex = readedData.findIndex(
-    (obj) => obj.id === contactId
+    (contact) => contact.id === contactId
   );
 
   if (findedContactIndex !== -1) {
