@@ -5,14 +5,14 @@ require("dotenv").config();
 const uriDb = process.env.uriDb;
 const PORT = process.env.PORT;
 
-const connection = mongoose.connect(uriDb);
+const connection = mongoose.connect(uriDb, { dbName: "phonebook" });
 
 connection
   .then(() => {
     app.listen(PORT, function () {
-      console.log(`Server running. Use our API on port: ${PORT}`);
+      console.log(`Database connection successful`);
     });
   })
   .catch((err) =>
-    console.log(`Server not running. Error message: ${err.message}`)
+    console.log(`Database connection failed. Error message: ${err.message}`)
   );
