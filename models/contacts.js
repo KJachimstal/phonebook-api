@@ -3,6 +3,16 @@ const fsPromise = require("fs/promises");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const Joi = require("joi");
+const mongoose = require("mongoose");
+require("dotenv").config();
+
+const dbConnection = async () => {
+  try {
+    await mongoose.connect(process.env.uriDb);
+  } catch (err) {
+    console.log("Connection error: ", err);
+  }
+};
 
 // * Declare file path
 const contactsPath = path.normalize("models/contacts.json");
