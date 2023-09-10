@@ -5,14 +5,18 @@ const userController = require("../controllers/user-controller");
 
 router.get("/", userController.auth, contactController.get);
 
-router.get("/:contactId", contactController.getById);
+router.get("/:contactId", userController.auth, contactController.getById);
 
-router.post("/", contactController.create);
+router.post("/", userController.auth, contactController.create);
 
-router.put("/:contactId", contactController.update);
+router.put("/:contactId", userController.auth, contactController.update);
 
-router.patch("/:contactId/favorite", contactController.updateFavorite);
+router.patch(
+  "/:contactId/favorite",
+  userController.auth,
+  contactController.updateFavorite
+);
 
-router.delete("/:contactId", contactController.remove);
+router.delete("/:contactId", userController.auth, contactController.remove);
 
 module.exports = router;
