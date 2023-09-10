@@ -1,14 +1,17 @@
 const service = require("../services/user-service");
 const Joi = require("joi");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const tokenSecret = process.env.tokenSecret;
 
-const signupValidation = Joi.object({
+const formValidation = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(4).alphanum().required(),
 });
 
 const signup = async (req, res, next) => {
   const { email, password } = req.body;
-  const validation = signupValidation.validate(req.body);
+  const validation = formValidation.validate(req.body);
 
   if (validation.error) {
     return res.status(400).json({
@@ -18,17 +21,13 @@ const signup = async (req, res, next) => {
     });
   }
 
-  try {
-    const conflict = await service.findUser({ email });
-    if (conflict) {
-      return res.status(409).json({
-        status: "error",
-        code: 409,
-        message: "Email in use",
-      });
-    }
-  } catch (e) {
-    next(e);
+  const conflict = await service.findUser({ email });
+  if (conflict) {
+    return res.status(409).json({
+      status: "error",
+      code: 409,
+      message: "Email in use",
+    });
   }
 
   try {
@@ -46,6 +45,43 @@ const signup = async (req, res, next) => {
   }
 };
 
+const signin = async (req, res, next) => {
+  const { email, password } = req.body;
+  const validation = formValidation.validate(req.body);
+
+  if (validation.error) {
+    return res.status(400).json({
+      status: "error",
+      code: 400,
+      message: validation.error.message,
+    });
+  }
+
+  const user = await service.findUser({ email });
+  if (!user || !user.validPassword(password)) {
+    return res.status(400).json({
+      status: "error",
+      code: 400,
+      message: "Incorrect login or password",
+    });
+  }
+
+  const payload = {
+    id: user.id,
+    username: user.username,
+  };
+  console.log(tokenSecret);
+  const token = jwt.sign(payload, tokenSecret, { expiresIn: "1h" });
+  return res.json({
+    status: "success",
+    code: 200,
+    data: {
+      token,
+    },
+  });
+};
+
 module.exports = {
   signup,
+  signin,
 };
