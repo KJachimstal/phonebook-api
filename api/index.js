@@ -14,4 +14,6 @@ router.patch("/:contactId/favorite", controller.updateFavorite);
 
 router.delete("/:contactId", controller.remove);
 
+router.post("/users/signup", controller.signup);
+
 module.exports = router;
