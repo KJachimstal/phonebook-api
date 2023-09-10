@@ -3,6 +3,7 @@ const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const tokenSecret = process.env.tokenSecret;
+const passport = require("passport");
 
 const formValidation = Joi.object({
   email: Joi.string().email().required(),
@@ -81,7 +82,22 @@ const signin = async (req, res, next) => {
   });
 };
 
+const auth = (req, res, next) => {
+  passport.authenticate("jwt", { session: false }, (err, user) => {
+    if (!user || err) {
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        message: "Unauthorized",
+      });
+    }
+    req.user = user;
+    next();
+  })(req, res, next);
+};
+
 module.exports = {
   signup,
   signin,
+  auth,
 };
