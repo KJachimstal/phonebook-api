@@ -1,7 +1,9 @@
 const User = require("../schemats/user");
 
 const createUser = async ({ email, password }) => {
-  return User.create({ email, password });
+  const newUser = new User({ email, password });
+  newUser.setPassword(password);
+  return await newUser.save();
 };
 
 const findUser = async ({ email }) => {

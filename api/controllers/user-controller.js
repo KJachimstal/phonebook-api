@@ -18,20 +18,32 @@ const signup = async (req, res, next) => {
     });
   }
 
-  const conflict = await service.findUser({ email });
-  console.log(conflict);
-  // try {
-  //   const result = await service.createUser({ email, password });
+  try {
+    const conflict = await service.findUser({ email });
+    if (conflict) {
+      return res.status(409).json({
+        status: "error",
+        code: 409,
+        message: "Email in use",
+      });
+    }
+  } catch (e) {
+    next(e);
+  }
 
-  //   res.status(201).json({
-  //     status: "success",
-  //     code: 201,
-  //     data: { contact: result },
-  //   });
-  // } catch (e) {
-  //   console.error(e);
-  //   next(e);
-  // }
+  try {
+    const newUser = await service.createUser({ email, password });
+    return res.status(201).json({
+      status: "created",
+      code: 201,
+      user: {
+        email: newUser.email,
+        subscription: newUser.subscription,
+      },
+    });
+  } catch (e) {
+    next(e);
+  }
 };
 
 module.exports = {
