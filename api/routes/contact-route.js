@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const contactController = require("../controllers/contact-controller");
+const userController = require("../controllers/user-controller");
 
-router.get("/", contactController.get);
+router.get("/", userController.auth, contactController.get);
 
 router.get("/:contactId", contactController.getById);
 
