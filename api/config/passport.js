@@ -12,13 +12,12 @@ const params = {
 };
 
 passport.use(
-  new Strategy(params, function (payload, done) {
+  new Strategy(params, (payload, done) => {
     User.find({ _id: payload.id })
       .then(([user]) => {
         if (!user) {
           return done(new Error("User not found"));
         }
-        console.log(user);
         return done(null, user);
       })
       .catch((err) => done(err));

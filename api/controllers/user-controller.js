@@ -86,6 +86,7 @@ const signin = async (req, res, next) => {
 
 const auth = (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (err, user) => {
+    console.log("auth", user);
     if (!user || err) {
       return res.status(401).json({
         status: "error",
@@ -101,8 +102,18 @@ const auth = (req, res, next) => {
 const logout = async (req, res, next) => {
   const loggedUserId = req.user.id;
   await service.setToken(loggedUserId, null);
-  req.user.token = null;
+  req.user = null;
+  req.logout((err) => next(err));
   return res.status(204).json();
+};
+
+const current = (req, res) => {
+  return res.status(200).json({
+    user: {
+      email: req.user.email,
+      subscription: req.user.subscription,
+    },
+  });
 };
 
 module.exports = {
@@ -110,4 +121,5 @@ module.exports = {
   signin,
   auth,
   logout,
+  current,
 };
