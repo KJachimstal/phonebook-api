@@ -22,7 +22,7 @@ const signup = async (req, res, next) => {
     });
   }
 
-  const conflict = await service.findUser({ email });
+  const conflict = await service.findUserByEmail({ email });
   if (conflict) {
     return res.status(409).json({
       status: "error",
@@ -58,7 +58,7 @@ const signin = async (req, res, next) => {
     });
   }
 
-  const user = await service.findUser({ email });
+  const user = await service.findUserByEmail({ email });
   if (!user || !user.validPassword(password)) {
     return res.status(400).json({
       status: "error",
@@ -71,8 +71,10 @@ const signin = async (req, res, next) => {
     id: user.id,
     username: user.username,
   };
-  console.log(tokenSecret);
   const token = jwt.sign(payload, tokenSecret, { expiresIn: "1h" });
+
+  service.setToken(user.id, token);
+
   return res.json({
     status: "success",
     code: 200,
@@ -96,8 +98,16 @@ const auth = (req, res, next) => {
   })(req, res, next);
 };
 
+const logout = async (req, res, next) => {
+  const loggedUserId = req.user.id;
+  await service.setToken(loggedUserId, null);
+  req.user.token = null;
+  return res.status(204).json();
+};
+
 module.exports = {
   signup,
   signin,
   auth,
+  logout,
 };

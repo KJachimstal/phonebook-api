@@ -6,11 +6,21 @@ const createUser = async ({ email, password }) => {
   return await newUser.save();
 };
 
-const findUser = async ({ email }) => {
+const findUserByEmail = async ({ email }) => {
   return User.findOne({ email });
+};
+
+const findUserById = async (id) => {
+  return User.findById(id);
+};
+
+const setToken = async (id, newToken) => {
+  return User.findByIdAndUpdate(id, { token: newToken });
 };
 
 module.exports = {
   createUser,
-  findUser,
+  findUserByEmail,
+  findUserById,
+  setToken,
 };
