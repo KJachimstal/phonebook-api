@@ -4,6 +4,9 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const tokenSecret = process.env.tokenSecret;
 const passport = require("passport");
+const path = require("path");
+const fs = require("fs").promises;
+const storeImage = require("../config/multer");
 
 const formValidation = Joi.object({
   email: Joi.string().email().required(),
@@ -115,10 +118,24 @@ const current = (req, res) => {
   });
 };
 
+const avatars = async (req, res, next) => {
+  const { description } = req.body;
+  const { path: temporaryName, originalname } = req.file;
+  const fileName = path.join(storeImage, originalname);
+  try {
+    await fs.rename(temporaryName, fileName);
+  } catch (err) {
+    await fs.unlink(temporaryName);
+    return next(err);
+  }
+  res.json({ description, message: "Załadowano plik", status: 200 });
+};
+
 module.exports = {
   signup,
   signin,
   auth,
   logout,
   current,
+  avatars,
 };
