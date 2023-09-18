@@ -10,6 +10,6 @@ router.post("/logout", userController.auth, userController.logout);
 
 router.get("/current", userController.auth, userController.current);
 
-router.post("avatars", userController.auth, userController.avatars);
+router.patch("/avatars", userController.auth, userController.avatars);
 
 module.exports = router;

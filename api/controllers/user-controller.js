@@ -120,6 +120,9 @@ const current = (req, res) => {
 
 const avatars = async (req, res, next) => {
   const { description } = req.body;
+  if (!req.file) {
+    return res.status(400).json("Missing file!");
+  }
   const { path: temporaryName, originalname } = req.file;
   const fileName = path.join(storeImage, originalname);
   try {
