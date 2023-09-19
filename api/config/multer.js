@@ -3,7 +3,7 @@ const path = require("path");
 const uploadDir = path.join(process.cwd(), "uploads");
 const storeImage = path.join(process.cwd(), "images");
 
-const storageImage = multer.diskStorage({
+const imageStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
@@ -16,11 +16,10 @@ const storageImage = multer.diskStorage({
 });
 
 const uploadedImage = multer({
-  storage: storageImage,
+  storage: imageStorage,
 });
 
 module.exports = {
-  storageImage,
   uploadedImage,
   storeImage,
   uploadDir,

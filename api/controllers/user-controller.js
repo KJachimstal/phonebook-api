@@ -119,19 +119,33 @@ const current = (req, res) => {
 };
 
 const avatars = async (req, res, next) => {
-  const { description } = req.body;
+  console.log(req.file);
+
   if (!req.file) {
     return res.status(400).json("Missing file!");
   }
-  const { path: temporaryName, originalname } = req.file;
-  const fileName = path.join(storeImage, originalname);
+
+  const { path } = req.file;
+  const { id } = req.user;
   try {
-    await fs.rename(temporaryName, fileName);
+    const newAvatarPath = await service.setAvatar(id, path);
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+      avatarPath: newAvatarPath,
+    });
   } catch (err) {
-    await fs.unlink(temporaryName);
-    return next(err);
+    res.status(500).json(`An error occurred while updating the avatar: ${err}`);
   }
-  res.json({ description, message: "Załadowano plik", status: 200 });
+  // const { path: temporaryName, originalname } = req.file;
+  // const fileName = path.join(storeImage, originalname);
+  // try {
+  //   await fs.rename(temporaryName, fileName);
+  // } catch (err) {
+  //   await fs.unlink(temporaryName);
+  //   return next(err);
+  // }
+  // res.json({ description, message: "Załadowano plik", status: 200 });
 };
 
 module.exports = {

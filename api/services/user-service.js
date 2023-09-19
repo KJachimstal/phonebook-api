@@ -18,9 +18,18 @@ const setToken = async (id, newToken) => {
   return User.findByIdAndUpdate(id, { token: newToken });
 };
 
+const setAvatar = async (id, filePath) => {
+  return User.findByIdAndUpdate(
+    id,
+    { avatarPath: filePath },
+    { new: true, select: "avatarPath" }
+  );
+};
+
 module.exports = {
   createUser,
   findUserByEmail,
   findUserById,
   setToken,
+  setAvatar,
 };
