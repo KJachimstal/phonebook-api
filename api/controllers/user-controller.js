@@ -4,9 +4,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const tokenSecret = process.env.tokenSecret;
 const passport = require("passport");
-const path = require("path");
-const fs = require("fs").promises;
-const storeImage = require("../config/multer");
+const gravatar = require("gravatar");
 
 const formValidation = Joi.object({
   email: Joi.string().email().required(),
@@ -35,7 +33,8 @@ const signup = async (req, res, next) => {
   }
 
   try {
-    const newUser = await service.createUser({ email, password });
+    const avatarPath = gravatar.url(email, { s: "250", protocol: "http" });
+    const newUser = await service.createUser({ email, password, avatarPath });
     return res.status(201).json({
       status: "created",
       code: 201,
@@ -135,17 +134,8 @@ const avatars = async (req, res, next) => {
       avatarPath: newAvatarPath,
     });
   } catch (err) {
-    res.status(500).json(`An error occurred while updating the avatar: ${err}`);
+    res.status(500).json(err);
   }
-  // const { path: temporaryName, originalname } = req.file;
-  // const fileName = path.join(storeImage, originalname);
-  // try {
-  //   await fs.rename(temporaryName, fileName);
-  // } catch (err) {
-  //   await fs.unlink(temporaryName);
-  //   return next(err);
-  // }
-  // res.json({ description, message: "Załadowano plik", status: 200 });
 };
 
 module.exports = {
