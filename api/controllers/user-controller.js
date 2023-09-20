@@ -127,8 +127,9 @@ const avatars = async (req, res, next) => {
 
   const filename = req.file.filename;
   const { id } = req.user;
-  const avatarPath = path.join("public", "avatars", filename);
-  fs.rename(`./uploads/${id}.jpg`, avatarPath, (err) => {
+  const avatarPath = path.join(process.cwd(), "public", "avatars", filename);
+  const tempPath = req.file.path;
+  fs.rename(tempPath, avatarPath, (err) => {
     if (err) throw err;
   });
 
