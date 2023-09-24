@@ -184,6 +184,25 @@ const verify = async (req, res, next) => {
   }
 };
 
+const verifyResend = async (req, res, next) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      message: "missing required field email",
+    });
+  } else {
+    const user = service.findUserByEmail(email);
+    if (user) {
+      //send verification email
+    } else {
+      return res.status(400).json({
+        message: "User not found",
+      });
+    }
+  }
+};
+
 module.exports = {
   signup,
   signin,
@@ -192,4 +211,5 @@ module.exports = {
   current,
   avatars,
   verify,
+  verifyResend,
 };
