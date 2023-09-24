@@ -4,6 +4,10 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const tokenSecret = process.env.tokenSecret;
 const passport = require("passport");
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs").promises;
+const jimp = require("jimp");
 
 const formValidation = Joi.object({
   email: Joi.string().email().required(),
@@ -32,7 +36,8 @@ const signup = async (req, res, next) => {
   }
 
   try {
-    const newUser = await service.createUser({ email, password });
+    const avatarPath = gravatar.url(email, { s: "250", protocol: "http" });
+    const newUser = await service.createUser({ email, password, avatarPath });
     return res.status(201).json({
       status: "created",
       code: 201,
@@ -115,10 +120,43 @@ const current = (req, res) => {
   });
 };
 
+const avatars = async (req, res, next) => {
+  if (!req.file) {
+    return res.status(400).json("Missing file!");
+  }
+
+  const filename = req.file.filename;
+  const { id } = req.user;
+  const avatarPath = path.join(process.cwd(), "public", "avatars", filename);
+  const tempPath = req.file.path;
+  fs.rename(tempPath, avatarPath, (err) => {
+    if (err) throw err;
+  });
+
+  jimp.read(avatarPath, (err, filename) => {
+    if (err) throw err;
+    filename.resize(250, 250).write(avatarPath);
+  });
+
+  try {
+    await service.setAvatar(id, avatarPath);
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+      data: {
+        avatarPath,
+      },
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
 module.exports = {
   signup,
   signin,
   auth,
   logout,
   current,
+  avatars,
 };
