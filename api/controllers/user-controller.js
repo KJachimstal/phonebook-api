@@ -8,6 +8,7 @@ const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs").promises;
 const jimp = require("jimp");
+const { v4: uuidv4 } = require("uuid");
 
 const formValidation = Joi.object({
   email: Joi.string().email().required(),
@@ -37,7 +38,14 @@ const signup = async (req, res, next) => {
 
   try {
     const avatarPath = gravatar.url(email, { s: "250", protocol: "http" });
-    const newUser = await service.createUser({ email, password, avatarPath });
+    const verificationToken = uuidv4();
+    console.log(verificationToken);
+    const newUser = await service.createUser({
+      email,
+      password,
+      avatarPath,
+      verificationToken,
+    });
     return res.status(201).json({
       status: "created",
       code: 201,
@@ -141,14 +149,31 @@ const avatars = async (req, res, next) => {
   try {
     await service.setAvatar(id, avatarPath);
     return res.status(200).json({
-      status: "success",
-      code: 200,
       data: {
         avatarPath,
       },
     });
   } catch (err) {
     res.status(500).json(err);
+  }
+};
+
+const verify = async (req, res, next) => {
+  const verificationToken = req.params.verificationToken;
+  const user = await service.findUserByVerificationToken({ verificationToken });
+  if (!user) {
+    return res.status(404).json({
+      data: {
+        message: "User not found",
+      },
+    });
+  } else {
+    await service.setVerification(user.id);
+    return res.status(200).json({
+      data: {
+        message: "Verification successful",
+      },
+    });
   }
 };
 
@@ -159,4 +184,5 @@ module.exports = {
   logout,
   current,
   avatars,
+  verify,
 };

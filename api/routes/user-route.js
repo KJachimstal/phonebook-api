@@ -18,4 +18,6 @@ router.patch(
   userController.avatars
 );
 
+router.get("/verify/:verificationToken", userController.verify);
+
 module.exports = router;
