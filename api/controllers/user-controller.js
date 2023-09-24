@@ -195,6 +195,9 @@ const verifyResend = async (req, res, next) => {
     const user = service.findUserByEmail(email);
     if (user.verify) {
       //send verification email
+      return res.status(400).json({
+        message: "Verification email sent",
+      });
     } else {
       return res.status(400).json({
         message: "Verification has already been passed",
