@@ -193,13 +193,16 @@ const verifyResend = async (req, res, next) => {
     });
   } else {
     const user = service.findUserByEmail(email);
-    if (user) {
+    if (user.verify) {
       //send verification email
     } else {
       return res.status(400).json({
-        message: "User not found",
+        message: "Verification has already been passed",
       });
     }
+    return res.status(400).json({
+      message: "User not found",
+    });
   }
 };
 
