@@ -9,6 +9,7 @@ const path = require("path");
 const fs = require("fs").promises;
 const jimp = require("jimp");
 const { v4: uuidv4 } = require("uuid");
+const transporter = require("../config/nodemailer");
 
 const formValidation = Joi.object({
   email: Joi.string().email().required(),
@@ -193,19 +194,38 @@ const verifyResend = async (req, res, next) => {
     });
   } else {
     const user = service.findUserByEmail(email);
-    if (user.verify) {
-      //send verification email
+
+    if (!user) {
       return res.status(400).json({
-        message: "Verification email sent",
+        message: "User not found",
       });
+    }
+
+    if (user.verify) {
+      const emailOptions = {
+        from: "your-email@test.pl",
+        to: user.email,
+        subject: "Verification",
+        text: "Cześć. Testujemy wysyłanie wiadomości!",
+      };
+
+      transporter
+        .sendMail(emailOptions)
+        .then(() =>
+          res.status(400).json({
+            message: "Verification email send",
+          })
+        )
+        .catch(() =>
+          res.status(400).json({
+            message: "Cannot send verification email",
+          })
+        );
     } else {
       return res.status(400).json({
         message: "Verification has already been passed",
       });
     }
-    return res.status(400).json({
-      message: "User not found",
-    });
   }
 };
 
