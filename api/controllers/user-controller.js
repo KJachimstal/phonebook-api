@@ -9,7 +9,25 @@ const path = require("path");
 const fs = require("fs").promises;
 const jimp = require("jimp");
 const { v4: uuidv4 } = require("uuid");
-const transporter = require("../config/nodemailer");
+const formData = require("form-data");
+const Mailgun = require("mailgun.js");
+const mailgun = new Mailgun(formData);
+const mg = mailgun.client({
+  username: "postmaster@sandbox436118c18efe4d58969284a79bdac930.mailgun.org",
+  key: process.env.MAILGUN_API_KEY,
+});
+
+const sendVerificationMail = async (user) => {
+  mg.messages
+    .create("sandbox436118c18efe4d58969284a79bdac930.mailgun.org", {
+      from: "Excited User <sandbox436118c18efe4d58969284a79bdac930@mailgun.org>",
+      to: "niemamcinicdopowiedzenia@gmail.com",
+      subject: "Verification",
+      text: "Please verify your email by follow this link: ",
+    })
+    .then((msg) => console.log(msg)) // logs response data
+    .catch((err) => console.log(err)); // logs
+};
 
 const formValidation = Joi.object({
   email: Joi.string().email().required(),
@@ -187,13 +205,14 @@ const verify = async (req, res, next) => {
 
 const verifyResend = async (req, res, next) => {
   const { email } = req.body;
+  let user = {};
 
   if (!email) {
     return res.status(400).json({
       message: "missing required field email",
     });
   } else {
-    const user = service.findUserByEmail(email);
+    user = await service.findUserByEmail(email);
 
     if (!user) {
       return res.status(400).json({
@@ -201,26 +220,8 @@ const verifyResend = async (req, res, next) => {
       });
     }
 
-    if (user.verify) {
-      const emailOptions = {
-        from: "your-email@test.pl",
-        to: user.email,
-        subject: "Verification",
-        text: "Cześć. Testujemy wysyłanie wiadomości!",
-      };
-
-      transporter
-        .sendMail(emailOptions)
-        .then(() =>
-          res.status(400).json({
-            message: "Verification email send",
-          })
-        )
-        .catch(() =>
-          res.status(400).json({
-            message: "Cannot send verification email",
-          })
-        );
+    if (!user.verify) {
+      sendVerificationMail(user);
     } else {
       return res.status(400).json({
         message: "Verification has already been passed",

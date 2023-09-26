@@ -11,7 +11,7 @@ const createUser = async ({
   return await newUser.save();
 };
 
-const findUserByEmail = async ({ email }) => {
+const findUserByEmail = async (email) => {
   return User.findOne({ email });
 };
 
