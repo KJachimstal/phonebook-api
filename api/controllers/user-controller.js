@@ -21,7 +21,7 @@ const sendVerificationMail = async (user) => {
   mg.messages
     .create("sandbox436118c18efe4d58969284a79bdac930.mailgun.org", {
       from: "Excited User <sandbox436118c18efe4d58969284a79bdac930@mailgun.org>",
-      to: "niemamcinicdopowiedzenia@gmail.com",
+      to: user.email,
       subject: "Verification",
       text: "Please verify your email by follow this link: ",
     })
