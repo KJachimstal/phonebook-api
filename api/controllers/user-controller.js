@@ -23,7 +23,8 @@ const sendVerificationMail = async (user) => {
       from: "Excited User <sandbox436118c18efe4d58969284a79bdac930@mailgun.org>",
       to: user.email,
       subject: "Verification",
-      text: "Please verify your email by follow this link: ",
+      text: "Please verify your email by follow this link. ",
+      html: `<strong>Please verify your email by follow this <a href="http://localhost:3000/api/users/verify/${user.verificationToken}">link</a>. </strong>`,
     })
     .then((msg) => console.log(msg)) // logs response data
     .catch((err) => console.log(err)); // logs
