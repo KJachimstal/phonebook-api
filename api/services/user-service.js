@@ -1,12 +1,17 @@
 const User = require("../schemats/user");
 
-const createUser = async ({ email, password, avatarPath }) => {
-  const newUser = new User({ email, password, avatarPath });
+const createUser = async ({
+  email,
+  password,
+  avatarPath,
+  verificationToken,
+}) => {
+  const newUser = new User({ email, password, avatarPath, verificationToken });
   newUser.setPassword(password);
   return await newUser.save();
 };
 
-const findUserByEmail = async ({ email }) => {
+const findUserByEmail = async (email) => {
   return User.findOne({ email });
 };
 
@@ -26,10 +31,20 @@ const setAvatar = async (id, filePath) => {
   );
 };
 
+const findUserByVerificationToken = async ({ verificationToken }) => {
+  return User.findOne({ verificationToken });
+};
+
+const setVerification = async (id) => {
+  return User.findByIdAndUpdate(id, { verify: true });
+};
+
 module.exports = {
   createUser,
   findUserByEmail,
   findUserById,
   setToken,
   setAvatar,
+  findUserByVerificationToken,
+  setVerification,
 };
